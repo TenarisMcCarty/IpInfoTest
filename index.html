@@ -3,16 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restricted GitHub Page</title>
+    <title>First Aiders Contact List - TenarisMcCarty</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: none; /* Hide content until location is validated */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        h1 {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+        .alert {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        .note {
+            font-size: 1em;
+            font-style: italic;
+            margin-top: 10px;
+            text-align: center;
+            color: #555;
+        }
+    </style>
     <script>
-        // Company's location coordinates (302 McCarty St, Houston, TX)
         const companyLat = 29.7678;
         const companyLon = -95.3102;
+        const allowedRadius = 2; // Radius in kilometers
 
-        // Allowed radius in kilometers (5 km)
-        const allowedRadius = 5;
-
-        // Function to calculate distance using Haversine formula
+        // Haversine formula to calculate distance between two coordinates
         function haversineDistance(lat1, lon1, lat2, lon2) {
             const toRad = (angle) => (Math.PI / 180) * angle;
             const R = 6371; // Earth's radius in kilometers
@@ -40,11 +84,10 @@
 
                         // Allow or deny access based on the calculated distance
                         if (distance <= allowedRadius) {
-                            document.body.innerHTML = 
-                              '<h1>Welcome to My Website</h1><p>You are within 5 km of the company location.</p>';
+                            document.body.style.display = 'block'; // Show the content
                         } else {
                             document.body.innerHTML = 
-                              '<h1>403 - Forbidden</h1><p>Access restricted to within 5 km of 302 McCarty St.</p>';
+                              '<h1>403 - Forbidden</h1><p>Access restricted to within 2 km of 302 McCarty St.</p>';
                         }
                     },
                     (error) => {
@@ -52,7 +95,8 @@
                         if (error.code === error.PERMISSION_DENIED) {
                             alert('You denied location access. Please allow location access to proceed.');
                         } else {
-                            document.body.innerHTML = '<h1>Error</h1><p>Could not retrieve your location.</p>';
+                            document.body.innerHTML = 
+                              '<h1>Error</h1><p>Could not retrieve your location. Please try again or use another browser.</p>';
                         }
                     }
                 );
@@ -67,7 +111,43 @@
     </script>
 </head>
 <body>
-    <h1>Checking your location...</h1>
-    <p>Please allow location access to proceed.</p>
+    <h1>First Aiders Contact List - TenarisMcCarty</h1>
+    <p class="alert">In case of severe injury or fire, call 911</p>
+    <p class="note">
+        Please be mindful of listed shift timings. Inform your supervisor of the first aid requirement. If the selected person does not answer, contact another listed person immediately.
+    </p>
+    <table>
+        <thead>
+            <tr>
+                <th>Area</th>
+                <th>Shift</th>
+                <th>Name</th>
+                <th>Phone Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="4">Building B</td>
+                <td>6:00 am – 2:00 pm</td>
+                <td>Villa Jose</td>
+                <td><a href="tel:+12812240348">(281) 224-0348</a></td>
+            </tr>
+            <tr>
+                <td>6:00 am – 2:00 pm</td>
+                <td>Garza Javier</td>
+                <td><a href="tel:+19793189129">(979) 318-9129</a></td>
+            </tr>
+            <tr>
+                <td>6:00 am – 4:00 pm</td>
+                <td>Martinez Jose</td>
+                <td><a href="tel:+17138589609">(713) 858-9609</a></td>
+            </tr>
+            <tr>
+                <td>10:00 pm – 6:00 am</td>
+                <td>Martinez Hilario</td>
+                <td><a href="tel:+18322487218">(832) 248-7218</a></td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>

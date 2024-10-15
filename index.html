@@ -5,30 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restricted GitHub Page</title>
     <script>
-        const geoApiUrl = 'https://ipinfo.io/json?token=a707f0cce5fc3b'; // Use your token
+        const geoApiUrl = 'https://ipinfo.io/json?token=a707f0cce5fc3b'; // Use your API token
 
         fetch(geoApiUrl)
             .then(response => response.json())
             .then(data => {
-                console.log('Visitor location data:', data);  // Debugging: view response in console
+                console.log('Visitor location data:', data);  // For debugging: Check location data in console
 
-                const allowedZip = '77026';  // ZIP code to allow access
-                const allowedCountry = 'US';  // Optional: restrict to US as well
+                const allowedCity = 'Houston';
+                const allowedRegion = 'Texas';  // Region name
 
-                // Check if visitor's country and ZIP code match the allowed ones
-                if (data.country !== allowedCountry || data.postal !== allowedZip) {
-                    alert('Access Denied: Your location is not allowed.');
-                    document.body.innerHTML = '<h1>403 - Forbidden</h1><p>Access restricted based on your location.</p>';
+                // Check if the visitor's city and region match the allowed ones
+                if (data.city !== allowedCity || data.region !== allowedRegion) {
+                    alert('Access Denied: Only visitors from Houston, TX are allowed.');
+                    document.body.innerHTML = 
+                      '<h1>403 - Forbidden</h1><p>Access restricted to visitors from Houston, TX.</p>';
                 }
             })
             .catch(error => {
                 console.error('Error fetching location:', error);
-                document.body.innerHTML = '<h1>Error</h1><p>Could not verify location.</p>';
+                document.body.innerHTML = '<h1>Error</h1><p>Could not verify your location.</p>';
             });
     </script>
 </head>
 <body>
     <h1>Welcome to My Website</h1>
-    <p>This content is accessible only from a specific ZIP code.</p>
+    <p>This content is accessible only from Houston, Texas.</p>
 </body>
 </html>

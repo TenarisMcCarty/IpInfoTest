@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restricted GitHub Page</title>
     <script>
-        // Houston's center coordinates
-        const houstonLat = 29.7604;
-        const houstonLon = -95.3698;
+        // Company's location coordinates (302 McCarty St, Houston, TX)
+        const companyLat = 29.7678;
+        const companyLon = -95.3102;
 
-        // Allowed radius in kilometers (50 km)
-        const allowedRadius = 50;
+        // Allowed radius in kilometers (5 km)
+        const allowedRadius = 5;
 
-        // Function to calculate distance between two lat/lon points using Haversine formula
+        // Function to calculate distance using Haversine formula
         function haversineDistance(lat1, lon1, lat2, lon2) {
             const toRad = (angle) => (Math.PI / 180) * angle;
             const R = 6371; // Earth's radius in kilometers
@@ -36,21 +36,24 @@
                         const userLat = position.coords.latitude;
                         const userLon = position.coords.longitude;
 
-                        const distance = haversineDistance(houstonLat, houstonLon, userLat, userLon);
+                        const distance = haversineDistance(companyLat, companyLon, userLat, userLon);
 
                         // Allow or deny access based on the calculated distance
                         if (distance <= allowedRadius) {
                             document.body.innerHTML = 
-                              '<h1>Welcome to My Website</h1><p>You are within the allowed area.</p>';
+                              '<h1>Welcome to My Website</h1><p>You are within 5 km of the company location.</p>';
                         } else {
                             document.body.innerHTML = 
-                              '<h1>403 - Forbidden</h1><p>Access restricted to the Houston area.</p>';
+                              '<h1>403 - Forbidden</h1><p>Access restricted to within 5 km of 302 McCarty St.</p>';
                         }
                     },
                     (error) => {
                         console.error('Geolocation error:', error);
-                        document.body.innerHTML = 
-                          '<h1>Error</h1><p>Could not retrieve your location.</p>';
+                        if (error.code === error.PERMISSION_DENIED) {
+                            alert('You denied location access. Please allow location access to proceed.');
+                        } else {
+                            document.body.innerHTML = '<h1>Error</h1><p>Could not retrieve your location.</p>';
+                        }
                     }
                 );
             } else {

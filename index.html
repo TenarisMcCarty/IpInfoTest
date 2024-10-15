@@ -4,6 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>First Aiders Contact List - TenarisMcCarty</title>
+    <script>
+        // Company's location coordinates (302 McCarty St, Houston, TX)
+        const companyLat = 29.7678;
+        const companyLon = -95.3102;
+
+        // Allowed radius in kilometers (5 km)
+        const allowedRadius = 5;
+
+        // Function to calculate distance using Haversine formula
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const toRad = (angle) => (Math.PI / 180) * angle;
+            const R = 6371; // Earth's radius in kilometers
+
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+
+            const a = Math.sin(dLat / 2) ** 2 +
+                      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                      Math.sin(dLon / 2) ** 2;
+
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // Request user's location via the browser's Geolocation API
+        function checkLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
+
+                        const distance = haversineDistance(companyLat, companyLon, userLat, userLon);
+
+                        // Allow or deny access based on the calculated distance
+                        if (distance <= allowedRadius) {
+                            document.body.innerHTML = 
+                              '<h1>Welcome to My Website</h1><p>You are within 5 km of the company location.</p>';
+                        } else {
+                            document.body.innerHTML = 
+                              '<h1>403 - Forbidden</h1><p>Access restricted to within 5 km of 302 McCarty St.</p>';
+                        }
+                    },
+                    (error) => {
+                        console.error('Geolocation error:', error);
+                        if (error.code === error.PERMISSION_DENIED) {
+                            alert('You denied location access. Please allow location access to proceed.');
+                        } else {
+                            document.body.innerHTML = '<h1>Error</h1><p>Could not retrieve your location.</p>';
+                        }
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+                document.body.innerHTML = '<h1>Error</h1><p>Geolocation not supported.</p>';
+            }
+        }
+
+        // Call the function on page load
+        window.onload = checkLocation;
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,13 +94,13 @@
         h1 {
             text-align: center;
             font-weight: bold;
-            font-size: 1.5em;
+            font-size: 1.5em; /* Title font size */
         }
         .alert {
             color: red;
             font-weight: bold;
             text-align: center;
-            font-size: 1.2em;
+            font-size: 1.2em; /* Slightly smaller than the title */
             margin-top: 10px;
         }
         .note {
@@ -50,79 +111,14 @@
             color: #555;
         }
     </style>
-    <script>
-        const companyLat = 29.7678;
-        const companyLon = -95.3102;
-        const allowedRadius = 2; // Radius in kilometers
-
-        // Haversine formula to calculate the distance between two coordinates
-        function haversineDistance(lat1, lon1, lat2, lon2) {
-            const toRad = (angle) => (Math.PI / 180) * angle;
-            const R = 6371; // Earth's radius in kilometers
-
-            const dLat = toRad(lat2 - lat1);
-            const dLon = toRad(lon2 - lon1);
-
-            const a = Math.sin(dLat / 2) ** 2 +
-                      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-                      Math.sin(dLon / 2) ** 2;
-
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
-        }
-
-        // Function to display the error message
-        function showError(message) {
-            document.body.innerHTML = `<h1>Error</h1><p>${message}</p>`;
-        }
-
-        // Function to check the user's location
-        function checkLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const userLat = position.coords.latitude;
-                        const userLon = position.coords.longitude;
-                        console.log(`User coordinates: ${userLat}, ${userLon}`);
-
-                        const distance = haversineDistance(companyLat, companyLon, userLat, userLon);
-                        console.log(`Distance: ${distance} km`);
-
-                        if (distance <= allowedRadius) {
-                            document.body.style.display = 'block'; // Show content
-                        } else {
-                            showError('403 - Forbidden. Access restricted to within 2 km of 302 McCarty St.');
-                        }
-                    },
-                    (error) => {
-                        console.error('Geolocation error:', error);
-                        if (error.code === error.PERMISSION_DENIED) {
-                            alert('You denied location access. Reload the page and allow location access.');
-                            showError('Location access is required to view the content.');
-                        } else {
-                            showError('Could not retrieve your location. Please try again or use another browser.');
-                        }
-                    }
-                );
-            } else {
-                alert('Geolocation is not supported by your browser.');
-                showError('Geolocation is not supported.');
-            }
-        }
-
-        // Call the function on page load
-        window.onload = () => {
-            console.log('Checking user location...');
-            document.body.style.display = 'none'; // Hide initially
-            checkLocation();
-        };
-    </script>
+    
 </head>
 <body>
     <h1>First Aiders Contact List - TenarisMcCarty</h1>
     <p class="alert">In case of severe injury or fire, call 911</p>
     <p class="note">
-        Please be mindful of listed shift timings. Inform your supervisor of the first aid requirement. If the selected person does not answer, contact another listed person immediately.
+        Please be mindful of listed shift timings. Inform your supervisor of the first aid requirement. Listed below are the volunteering first aiders. Your selected person may not answer the phone. 
+        If you cannot reach the selected volunteer, contact another listed person immediately.
     </p>
     <table>
         <thead>
@@ -134,6 +130,7 @@
             </tr>
         </thead>
         <tbody>
+            <!-- Building B -->
             <tr>
                 <td rowspan="4">Building B</td>
                 <td>6:00 am – 2:00 pm</td>
@@ -154,6 +151,163 @@
                 <td>10:00 pm – 6:00 am</td>
                 <td>Martinez Hilario</td>
                 <td><a href="tel:+18322487218">(832) 248-7218</a></td>
+            </tr>
+            <!-- Building C -->
+            <tr>
+                <td rowspan="5">Building C</td>
+                <td>6:00 am – 2:00 pm</td>
+                <td>West Todd</td>
+                <td><a href="tel:+17135015946">(713) 501-5946</a></td>
+            </tr>
+            <tr>
+                <td>6:00 am – 2:00 pm</td>
+                <td>Saucedo Antonio</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>10:00 am – 6:00 pm</td>
+                <td>Garnica Alex</td>
+                <td><a href="tel:+12813033784">(281) 303-3784</a></td>
+            </tr>
+            <tr>
+                <td>2:00 pm – 10:00 pm</td>
+                <td>Williams Iii Patrick</td>
+                <td><a href="tel:+12817941241">(281) 794-1241</a></td>
+            </tr>
+            <tr>
+                <td>10:00 pm – 6:00 am</td>
+                <td>Ramirez Isai</td>
+                <td>-</td>
+            </tr>
+            <!-- Building E -->
+            <tr>
+                <td rowspan="6">Building E</td>
+                <td>6:00 am – 2:00 pm</td>
+                <td>Blanco Fernando</td>
+                <td><a href="tel:+17137329726">(713) 732-9726</a></td>
+            </tr>
+            <tr>
+                <td>6:00 am – 2:00 pm</td>
+                <td>Dominguez Jorge</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>8:00 am – 5:00 pm</td>
+                <td>De Aguinaga La Riva Karin</td>
+                <td><a href="tel:+12819042745">(281) 904-2745</a></td>
+            </tr>
+            <tr>
+                <td>2:00 pm – 10:00 pm</td>
+                <td>Berlanga Gabriel</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>10:00 pm – 6:00 am</td>
+                <td>Hurtado Angel</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>11:00 pm – 8:00 am</td>
+                <td>Bahena Jorge</td>
+                <td><a href="tel:+18327079416">(832) 707-9416</a></td>
+            </tr>
+            <!-- Office -->
+            <tr>
+                <td rowspan="6">Office</td>
+                <td>6:00 am – 2:00 pm</td>
+                <td>Rivas Oberto Jesus</td>
+                <td><a href="tel:+17132946227">(713) 294-6227</a></td>
+            </tr>
+            <tr>
+                <td>7:00 am – 3:00 pm</td>
+                <td>Sweet Kimberly</td>
+                <td><a href="tel:+18328463128">(832) 846-3128</a></td>
+            </tr>
+            <tr>
+                <td>8:00 am – 5:00 pm</td>
+                <td>Herman Daniel</td>
+                <td><a href="tel:+19792166780">(979) 216-6780</a></td>
+            </tr>
+            <tr>
+                <td>8:00 am – 5:00 pm</td>
+                <td>Gonzalez Josue</td>
+                <td><a href="tel:+18326710769">(832) 671-0769</a></td>
+            </tr>
+            <tr>
+                <td>8:00 am – 5:00 pm</td>
+                <td>Mena Manuel</td>
+                <td><a href="tel:+18323411657">(832) 341-1657</a></td>
+            </tr>
+            <tr>
+                <td>8:00 am – 5:00 pm</td>
+                <td>Falcon Annamarie</td>
+                <td><a href="tel:+12817934389">(281) 793-4389</a></td>
+            </tr>
+            <!-- Building L -->
+            <tr>
+                <td>Building L</td>
+                <td>2:00 am – 2:00 pm</td>
+                <td>Davis Roderick E.</td>
+                <td><a href="tel:+12816104163">(281) 610-4163</a></td>
+            </tr>
+            <!-- EMG -->
+            <tr>
+                <td rowspan="3">EMG</td>
+                <td>6:00 am – 6:00 pm</td>
+                <td>Cruz Wilmer</td>
+                <td><a href="tel:+12817941241">(281) 794-1241</a></td>
+            </tr>
+            <tr>
+                <td>2:00 pm – 10:00 pm</td>
+                <td>Ventura Alfredo</td>
+                <td><a href="tel:+17135163034">(713) 516-3034</a></td>
+            </tr>
+            <tr>
+                <td>2:00 pm – 10:00 pm</td>
+                <td>Garcia Torrealba Luis Alexander</td>
+                <td>-</td>
+            </tr>
+            <!-- SUCH/ Yard -->
+            <tr>
+                <td rowspan="8">SUCH/ Yard</td>
+                <td>6:00 am – 2:00 pm</td>
+                <td>Garcia John</td>
+                <td><a href="tel:+18324681898">(832) 468-1898</a></td>
+            </tr>
+            <tr>
+                <td>7:00 am – 3:00 pm</td>
+                <td>Gallegos Gustavo</td>
+                <td><a href="tel:+19362356566">(936) 235-6566</a></td>
+            </tr>
+            <tr>
+                <td>8:00 am – 4:00 pm</td>
+                <td>German Juan</td>
+                <td><a href="tel:+18325646852">(832) 564-6852</a></td>
+            </tr>
+            <tr>
+                <td>8:00 am – 5:00 pm</td>
+                <td>Escobedo David</td>
+                <td><a href="tel:+18323528150">(832) 352-8150</a></td>
+            </tr>
+            <tr>
+                <td>8:00 am – 5:00 pm</td>
+                <td>Carboni Barbara</td>
+                <td><a href="tel:+18324722184">(832) 472-2184</a></td>
+            </tr>
+            <tr>
+                <td>9:30 am – 5:30 pm</td>
+                <td>Ramirez Juan</td>
+                <td><a href="tel:+18322674702">(832) 267-4702</a></td>
+            </tr>
+            <tr>
+                <td>2:00 pm – 10:00 pm</td>
+                <td>Peavy Ray</td>
+                <td><a href="tel:+18328297083">(832) 829-7083</a></td>
+            </tr>
+            <tr>
+                <td>10:00 pm – 6:00 am</td>
+                <td>Salas Bernabe</td>
+                <td><a href="tel:+12815464797">(281) 546-4797</a></td>
             </tr>
         </tbody>
     </table>

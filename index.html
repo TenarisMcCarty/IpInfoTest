@@ -8,7 +8,6 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            display: none; /* Hide content until location is validated */
         }
         table {
             width: 100%;
@@ -56,7 +55,7 @@
         const companyLon = -95.3102;
         const allowedRadius = 2; // Radius in kilometers
 
-        // Haversine formula to calculate distance between two coordinates
+        // Haversine formula to calculate the distance between two coordinates
         function haversineDistance(lat1, lon1, lat2, lon2) {
             const toRad = (angle) => (Math.PI / 180) * angle;
             const R = 6371; // Earth's radius in kilometers
@@ -72,42 +71,51 @@
             return R * c;
         }
 
-        // Request user's location via the browser's Geolocation API
+        // Function to display the error message
+        function showError(message) {
+            document.body.innerHTML = `<h1>Error</h1><p>${message}</p>`;
+        }
+
+        // Function to check the user's location
         function checkLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const userLat = position.coords.latitude;
                         const userLon = position.coords.longitude;
+                        console.log(`User coordinates: ${userLat}, ${userLon}`);
 
                         const distance = haversineDistance(companyLat, companyLon, userLat, userLon);
+                        console.log(`Distance: ${distance} km`);
 
-                        // Allow or deny access based on the calculated distance
                         if (distance <= allowedRadius) {
-                            document.body.style.display = 'block'; // Show the content
+                            document.body.style.display = 'block'; // Show content
                         } else {
-                            document.body.innerHTML = 
-                              '<h1>403 - Forbidden</h1><p>Access restricted to within 2 km of 302 McCarty St.</p>';
+                            showError('403 - Forbidden. Access restricted to within 2 km of 302 McCarty St.');
                         }
                     },
                     (error) => {
                         console.error('Geolocation error:', error);
                         if (error.code === error.PERMISSION_DENIED) {
-                            alert('You denied location access. Please allow location access to proceed.');
+                            alert('You denied location access. Reload the page and allow location access.');
+                            showError('Location access is required to view the content.');
                         } else {
-                            document.body.innerHTML = 
-                              '<h1>Error</h1><p>Could not retrieve your location. Please try again or use another browser.</p>';
+                            showError('Could not retrieve your location. Please try again or use another browser.');
                         }
                     }
                 );
             } else {
-                alert('Geolocation is not supported by this browser.');
-                document.body.innerHTML = '<h1>Error</h1><p>Geolocation not supported.</p>';
+                alert('Geolocation is not supported by your browser.');
+                showError('Geolocation is not supported.');
             }
         }
 
         // Call the function on page load
-        window.onload = checkLocation;
+        window.onload = () => {
+            console.log('Checking user location...');
+            document.body.style.display = 'none'; // Hide initially
+            checkLocation();
+        };
     </script>
 </head>
 <body>

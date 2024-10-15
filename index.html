@@ -5,17 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>First Aiders Contact List - TenarisMcCarty</title>
     <script>
-        // Company's location coordinates (302 McCarty St, Houston, TX)
         const companyLat = 29.7678;
         const companyLon = -95.3102;
-
-        // Allowed radius in kilometers (5 km)
         const allowedRadius = 5;
 
-        // Function to calculate distance using Haversine formula
         function haversineDistance(lat1, lon1, lat2, lon2) {
             const toRad = (angle) => (Math.PI / 180) * angle;
-            const R = 6371; // Earth's radius in kilometers
+            const R = 6371; // Radius of Earth in kilometers
 
             const dLat = toRad(lat2 - lat1);
             const dLon = toRad(lon2 - lon1);
@@ -28,7 +24,6 @@
             return R * c;
         }
 
-        // Request user's location via the browser's Geolocation API
         function checkLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -38,13 +33,15 @@
 
                         const distance = haversineDistance(companyLat, companyLon, userLat, userLon);
 
-                        // Allow or deny access based on the calculated distance
+                        const accessGranted = document.getElementById('access-granted');
+                        const accessDenied = document.getElementById('access-denied');
+
                         if (distance <= allowedRadius) {
-                            document.body.innerHTML = 
-                              '<h1>Welcome to My Website</h1><p>You are within 5 km of the company location.</p>';
+                            accessGranted.style.display = 'block';
+                            accessDenied.style.display = 'none';
                         } else {
-                            document.body.innerHTML = 
-                              '<h1>403 - Forbidden</h1><p>Access restricted to within 5 km of 302 McCarty St.</p>';
+                            accessGranted.style.display = 'none';
+                            accessDenied.style.display = 'block';
                         }
                     },
                     (error) => {
@@ -62,7 +59,6 @@
             }
         }
 
-        // Call the function on page load
         window.onload = checkLocation;
     </script>
     <style>
@@ -94,13 +90,13 @@
         h1 {
             text-align: center;
             font-weight: bold;
-            font-size: 1.5em; /* Title font size */
+            font-size: 1.5em;
         }
         .alert {
             color: red;
             font-weight: bold;
             text-align: center;
-            font-size: 1.2em; /* Slightly smaller than the title */
+            font-size: 1.2em;
             margin-top: 10px;
         }
         .note {
@@ -110,26 +106,29 @@
             text-align: center;
             color: #555;
         }
+        #access-granted, #access-denied {
+            display: none;
+        }
     </style>
-    
 </head>
 <body>
-    <h1>First Aiders Contact List - TenarisMcCarty</h1>
-    <p class="alert">In case of severe injury or fire, call 911</p>
-    <p class="note">
-        Please be mindful of listed shift timings. Inform your supervisor of the first aid requirement. Listed below are the volunteering first aiders. Your selected person may not answer the phone. 
-        If you cannot reach the selected volunteer, contact another listed person immediately.
-    </p>
-    <table>
-        <thead>
-            <tr>
-                <th>Area</th>
-                <th>Shift</th>
-                <th>Name</th>
-                <th>Phone Number</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div id="access-granted">
+        <h1>First Aiders Contact List - TenarisMcCarty</h1>
+        <p class="alert">In case of severe injury or fire, call 911</p>
+        <p class="note">
+            Please be mindful of listed shift timings. Inform your supervisor of the first aid requirement.
+            If you cannot reach the selected volunteer, contact another listed person immediately.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Area</th>
+                    <th>Shift</th>
+                    <th>Name</th>
+                    <th>Phone Number</th>
+                </tr>
+            </thead>
+            <tbody>
             <!-- Building B -->
             <tr>
                 <td rowspan="4">Building B</td>
@@ -311,5 +310,11 @@
             </tr>
         </tbody>
     </table>
+  </div>
+
+    <div id="access-denied">
+        <h1>403 - Forbidden</h1>
+        <p>Access restricted to within 5 km of 302 McCarty St.</p>
+    </div>      
 </body>
 </html>

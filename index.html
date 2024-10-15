@@ -5,21 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restricted GitHub Page</title>
     <script>
-        const geoApiUrl = 'https://ipinfo.io/json?token=a707f0cce5fc3b'; // Use your API token
+        const geoApiUrl = 'https://ipinfo.io/json?token=a707f0cce5fc3b'; // Your IPinfo token
+
+        // Houston's center coordinates
+        const houstonLat = 29.7604;
+        const houstonLon = -95.3698;
+
+        // Radius in kilometers (e.g., 50 km)
+        const allowedRadius = 50;
+
+        // Function to calculate distance between two lat/lon points using Haversine formula
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const toRad = (angle) => (Math.PI / 180) * angle;
+            const R = 6371; // Earth's radius in kilometers
+
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+
+            const a = Math.sin(dLat / 2) ** 2 +
+                      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                      Math.sin(dLon / 2) ** 2;
+
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
 
         fetch(geoApiUrl)
             .then(response => response.json())
             .then(data => {
-                console.log('Visitor location data:', data);  // For debugging: Check location data in console
+                console.log('Visitor location data:', data);  // Debugging: Check response in console
 
-                const allowedCity = 'Houston';
-                const allowedRegion = 'Texas';  // Region name
+                // Extract latitude and longitude from IPinfo response
+                const [lat, lon] = data.loc.split(',').map(Number);
 
-                // Check if the visitor's city and region match the allowed ones
-                if (data.city !== allowedCity || data.region !== allowedRegion) {
-                    alert('Access Denied: Only visitors from Houston, TX are allowed.');
+                // Calculate the distance from Houston's center
+                const distance = haversineDistance(houstonLat, houstonLon, lat, lon);
+
+                // Check if the visitor is within the allowed radius
+                if (distance > allowedRadius) {
+                    alert('Access Denied: Only visitors within 50 km of Houston are allowed.');
                     document.body.innerHTML = 
-                      '<h1>403 - Forbidden</h1><p>Access restricted to visitors from Houston, TX.</p>';
+                      '<h1>403 - Forbidden</h1><p>Access restricted to the Houston area.</p>';
                 }
             })
             .catch(error => {
@@ -30,6 +56,6 @@
 </head>
 <body>
     <h1>Welcome to My Website</h1>
-    <p>This content is accessible only from Houston, Texas.</p>
+    <p>This content is accessible only from within 50 km of Houston.</p>
 </body>
 </html>

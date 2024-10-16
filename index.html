@@ -47,7 +47,7 @@
                     (error) => {
                         console.error('Geolocation error:', error);
                         if (error.code === error.PERMISSION_DENIED) {
-                            alert('You denied location access. Please allow location access to proceed.');
+                            alert('You have denied the location access. The contact list is only accessible to personnel in TenarisMcCarty. Please reload the page and allow location access to proceed.');
                         } else {
                             document.body.innerHTML = '<h1>Error</h1><p>Could not retrieve your location.</p>';
                         }
@@ -55,7 +55,7 @@
                 );
             } else {
                 alert('Geolocation is not supported by this browser.');
-                document.body.innerHTML = '<h1>Error</h1><p>Geolocation not supported.</p>';
+                document.body.innerHTML = '<h1>Browser Not Supported</h1><p>Browser not supported. Please copy the link and try in a different browser.</p>';
             }
         }
 
